@@ -317,12 +317,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bounds: {x: -5, y: -5, z: 10, w: 10}
   count: 0
-  color: {r: 0.1822268, g: 0.7046738, b: 0.8584906, a: 0.8666667}
+  material:
+    color: {x: 0.1, y: 1, z: 0.1, w: 1}
+    solidRadious: 0.2
+    maxRadious: 1
   alphaCutoff: 0.8
   smoothFactor: 0.01
   radious: 0.5
-  solidRadious: 0.2
-  maxRadious: 1
   dpi: 100
   spriteRenderer: {fileID: 1078376225}
   fluidParticlesCompute: {fileID: 0}

@@ -8,16 +8,29 @@
 
     struct Particle {
         float2 pos;
+        uint material;
     };
-    Buffer<Particle> particles;
+    StructuredBuffer<Particle> particles;
 
     float solidRadious;
     float maxRadious;
 
+// materials
+    struct Material {
+        float4 color;
+        float solidRadious;
+        float maxRadious;
+    };
+    StructuredBuffer<Material> materials;
 // texture
     float dpi;
     uint2 texSize;
     RWTexture2D<float4> tex;
+
+// utilities
+    float3 AlphaBlend(float4 a, float4 b) {  // a over b
+        return b.rgb * (1 - a.a) + a.rgb * a.a;
+    }
 
 [numthreads(8, 8, 1)]
 void CSMain(uint3 id : SV_DispatchThreadID)
@@ -32,6 +45,10 @@ void CSMain(uint3 id : SV_DispatchThreadID)
 
     for (uint i = 0; i < count; i++) {
         float dist = sqrt((x - particles[i].pos.x) * (x - particles[i].pos.x) + (y - particles[i].pos.y) * (y - particles[i].pos.y));
-        tex[id.xy] += 1 - smoothstep(solidRadious, maxRadious, dist);
+        Material mat = materials[particles[i].material];
+
+        float a = 1 - smoothstep(mat.solidRadious, mat.maxRadious, dist);
+        
+        tex[id.xy] = float4(AlphaBlend(mat.color, tex[id.xy]), tex[id.xy].a * (1 - a) + a);
     }
 }

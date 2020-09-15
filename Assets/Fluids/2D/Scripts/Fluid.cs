@@ -11,17 +11,17 @@ namespace Fluids._2D
 
         public int count;
         public ComputeBuffer particleBuffer;
+        public ComputeBuffer materialBuffer;
 
 
         [Header("Material")]
-        public Color color;
+        [SerializeField]
+        public Material[] materials;
+
         public float alphaCutoff;
         public float smoothFactor;
 
         public float radious;
-
-        public float solidRadious;
-        public float maxRadious;
 
         [Header("Texture")]
         public float dpi;
@@ -65,17 +65,11 @@ namespace Fluids._2D
 
         private void OnDestroy()
         {
-            if (particleBuffer != null)
-            {
-                particleBuffer.Release();
-            }
+            ResetBuffers();
         }
         private void OnApplicationQuit()
         {
-            if (particleBuffer != null)
-            {
-                particleBuffer.Release();
-            }
+            ResetBuffers();
         }
 
 
@@ -128,10 +122,10 @@ namespace Fluids._2D
             // fluidBaseCompute
             fluidBaseCompute.SetVector("bounds", bounds);
 
-            fluidBaseCompute.SetFloat("solidRadious", solidRadious);
-            fluidBaseCompute.SetFloat("maxRadious", maxRadious);
+            materialBuffer = new ComputeBuffer(materials.Length, Material.stride);
+            materialBuffer.SetData(materials);
 
-            fluidBaseCompute.SetVector("color", new Vector4(color.r, color.g, color.b, color.a));
+            fluidBaseCompute.SetBuffer(0, "materials", materialBuffer);
 
             fluidBaseCompute.SetFloat("dpi", dpi);
 
@@ -140,8 +134,6 @@ namespace Fluids._2D
             //fluidMaterialCompute
             fluidMaterialCompute.SetFloat("alphaCutoff", alphaCutoff);
             fluidMaterialCompute.SetFloat("smoothFactor", smoothFactor);
-
-            fluidMaterialCompute.SetVector("color", new Vector4(color.r, color.g, color.b, color.a));
 
             fluidMaterialCompute.SetVector("texSize", (Vector2)texSize);
         }
@@ -187,5 +179,12 @@ namespace Fluids._2D
             }
         }
 
+        void ResetBuffers()
+        {
+            if (particleBuffer != null)
+                particleBuffer.Release();
+            if (materialBuffer != null)
+                materialBuffer.Release();
+        }
     }
 }

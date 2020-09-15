@@ -3,8 +3,6 @@
 float alphaCutoff;
 float smoothFactor;
 
-float4 color;
-
 uint2 texSize;
 RWTexture2D<float4> tex;
 
@@ -16,5 +14,5 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 
 	float a = smoothstep(alphaCutoff - smoothFactor, alphaCutoff + smoothFactor, tex[id.xy].a);
 
-	tex[id.xy] = float4(color.x, color.y, color.z, color.a * a);
+	tex[id.xy] = float4(tex[id.xy].rgb, tex[id.xy].a * a);
 }
