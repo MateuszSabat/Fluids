@@ -18,6 +18,7 @@
 // materials
     struct Material {
         float4 color;
+        float radious;
         float solidRadious;
         float maxRadious;
     };
@@ -28,8 +29,8 @@
     RWTexture2D<float4> tex;
 
 // utilities
-    float3 AlphaBlend(float4 a, float4 b) {  // a over b
-        return b.rgb * (1 - a.a) + a.rgb * a.a;
+    float3 AlphaBlend(float4 a, float4 b, float alpha) {  // a over b
+        return b.rgb * (1 - a.a * alpha) + a.rgb * a.a * alpha;
     }
 
 [numthreads(8, 8, 1)]
@@ -45,10 +46,10 @@ void CSMain(uint3 id : SV_DispatchThreadID)
 
     for (uint i = 0; i < count; i++) {
         float dist = sqrt((x - particles[i].pos.x) * (x - particles[i].pos.x) + (y - particles[i].pos.y) * (y - particles[i].pos.y));
-        Material mat = materials[particles[i].material];
 
-        float a = 1 - smoothstep(mat.solidRadious, mat.maxRadious, dist);
+        float a = 1 - smoothstep(materials[particles[i].material].solidRadious, materials[particles[i].material].maxRadious, dist);
         
-        tex[id.xy] = float4(AlphaBlend(mat.color, tex[id.xy]), tex[id.xy].a * (1 - a) + a);
+        tex[id.xy] = float4(AlphaBlend(materials[particles[i].material].color, tex[id.xy], a), tex[id.xy].a * (1 - a) + a);
+        //tex[id.xy] = float4(materials[particles[i].material].color.xyz, tex[id.xy].a * (1 - a) + a);
     }
 }

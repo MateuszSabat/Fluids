@@ -15,7 +15,6 @@ namespace Fluids._2D
 
 
         [Header("Material")]
-        [SerializeField]
         public Material[] materials;
 
         public float alphaCutoff;
@@ -49,6 +48,7 @@ namespace Fluids._2D
             ts = new Transform[20];
             for (int i = 0; i < ts.Length; i++)
                 ts[i] = Instantiate(particlePrefab).transform;
+
             SetComputeData();
             UpdateTexture();
 
@@ -56,8 +56,15 @@ namespace Fluids._2D
         private void Update()
         {
             Particle[] ps = new Particle[ts.Length];
-            for (int i = 0; i < ps.Length; i++)
-                ps[i] = new Particle(ts[i].position.x, ts[i].position.y);
+            for (int i = 0; i < ps.Length; i ++)
+            {
+                ps[i] = new Particle(ts[i].position.x, ts[i].position.y, 1);
+            }
+            ps[1].material = 0;
+            ps[2].material = 0;
+            ps[3].material = 0;
+            ps[4].material = 0;
+
             ResetParticleBuffer();
             AddParticles(ps);
             UpdateTexture();
